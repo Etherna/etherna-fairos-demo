@@ -30,36 +30,13 @@ services:
     ports:
       - 9090:9090
     entrypoint: [ "/go/fairOS-dfs/dist/dfs", "server", "--beeHost", "bee", "--beePort", "1633", "--dataDir", "/go/fairOS-dfs/dist/data" ]
-    
-  # Mongo
-  mongo:
-    hostname: mongo
-    image: mongo:4.4
-    volumes:
-      - mongo-db-data:/data/db
-      - mongo-configdb-data:/data/configdb
-    networks:
-      - mongo-net
-    restart: unless-stopped
-    entrypoint: [ "/usr/bin/mongod", "--bind_ip_all" ]
-    
-  # Etherna SSO
-  
-  # Etherna Index
-  
-  # Etherna Credit
-  
-  # Etherna Dapp
   
   # FairOS-dfs file explorer
     
     
 networks:
   bee-net:
-  mongo-net:
       
 volumes:
   bee-data:
   dfs-server-data:
-  mongo-db-data:
-  mongo-configdb-data:

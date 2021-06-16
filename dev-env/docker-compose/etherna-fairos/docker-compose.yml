@@ -5,18 +5,20 @@ services:
   bee:
     hostname: bee
     image: ethersphere/bee:0.6
-    restart: unless-stopped
     environment:
       - BEE_FULL_NODE=true
       - BEE_PASSWORD=psw
       - BEE_SWAP_ENDPOINT=<change_me>
+      ## cache capacity in chunks, multiply by 4096 to get approximate capacity in bytes
+      - BEE_CACHE_CAPACITY=250000
+
     restart: unless-stopped
     networks:
       - bee-net
     volumes:
       - bee-data:/home/bee/.bee
     command: start
-    
+
   # FairOS-dfs
   dfs-server:
     image: etherna/fairos-dfs:master
@@ -30,13 +32,10 @@ services:
     ports:
       - 9090:9090
     entrypoint: [ "/go/fairOS-dfs/dist/dfs", "server", "--beeHost", "bee", "--beePort", "1633", "--dataDir", "/go/fairOS-dfs/dist/data" ]
-  
-  # FairOS-dfs file explorer
-    
-    
+
 networks:
   bee-net:
-      
+
 volumes:
   bee-data:
   dfs-server-data:

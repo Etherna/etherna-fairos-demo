@@ -4,6 +4,7 @@ const useStyles = makeStyles(() =>
   createStyles({
     videoPreview: {
       height: '100%',
+      width: '100%',
       display: 'flex',
       flexDirection: 'column',
       cursor: 'default'
@@ -21,7 +22,9 @@ const useStyles = makeStyles(() =>
     },
     play: {
       position: 'absolute',
-      inset: '0',
+      left: '50%',
+      top: '50%',
+      transform: 'translateX(-50%) translateY(-50%)',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
@@ -30,13 +33,10 @@ const useStyles = makeStyles(() =>
         filter: 'drop-shadow(0 0 8px rgba(0, 0, 0, .7))',
       }
     },
-    errorIcon: {
-      width: "8rem",
-      height: "8rem",
-      position: 'absolute',
-      inset: '0',
-      margin: 'auto',
-      transform: 'translateX(-50%)'
+    video: {
+      width: '100%',
+      height: 'auto',
+      maxHeight: '100%',
     },
     title: {
       fontWeight: 'bold',
@@ -53,6 +53,7 @@ const useStyles = makeStyles(() =>
       fontSize: '1.75rem',
       backgroundColor: '#494b50',
       borderRadius: 6,
+      width: '100%',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',

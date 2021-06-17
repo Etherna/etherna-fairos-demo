@@ -1,16 +1,16 @@
 import React, { useEffect, useState } from "react"
 
 import useStyles from "./filePreviewVideoStyles"
-import { ReactComponent as Spinner } from "../../../../media/UI/spinner-2.svg"
+import { ReactComponent as Spinner } from "../../../../media/UI/spinner.svg"
 import { ReactComponent as Play } from "../../../../media/UI/play.svg"
 import { ReactComponent as Logo } from "./logo.svg"
-import { InfoIcon } from "../../../../components/icons/icons"
 
 import SwarmImg from "../swarmImg"
 import VideoStats from "../videoStats/videoStats"
 import SwarmImageReader from "../../classes/swarm-image/swarm-image-reader"
 import VideoResolver from "../../classes/video-resolver/video-resolver"
 import { Video } from "../../classes/video-resolver/types"
+import { filePreview } from "../../../../store/services/fairOS"
 
 type FilePreviewVideoProps = {
   downloadUrl: string
@@ -19,13 +19,19 @@ type FilePreviewVideoProps = {
 const FilePreviewVideo: React.FC<FilePreviewVideoProps> = ({ downloadUrl }) => {
   const [title, setTitle] = useState<string>()
   const [externalLink, setExternalLink] = useState<string>()
-  const [image, setImage] = useState<SwarmImageReader>()
-  const [video, setVideo] = useState<Video>()
+  const [image, setImage] = useState<SwarmImageReader | undefined>()
+  const [video, setVideo] = useState<Video | undefined>()
+  const [videoSrc, setVideoSrc] = useState<string>()
+  const [isPlaying, setIsPlaying] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const classes = useStyles()
 
   useEffect(() => {
     loadVideo()
+
+    return () => {
+      URL.revokeObjectURL(videoSrc)
+    }
   }, [])
 
   const loadVideo = async () => {
@@ -46,6 +52,9 @@ const FilePreviewVideo: React.FC<FilePreviewVideoProps> = ({ downloadUrl }) => {
       setExternalLink(`${process.env.REACT_APP_ETHERNA_HOST}/watch?v=${video.manifestHash}`)
     }
 
+    const preview = await filePreview(downloadUrl)
+    setVideoSrc(window.URL.createObjectURL(preview))
+
     setIsLoading(false)
   }
 
@@ -53,23 +62,25 @@ const FilePreviewVideo: React.FC<FilePreviewVideoProps> = ({ downloadUrl }) => {
     <div className={classes.videoPreview}>
       <div className={classes.thumbnail}>
         {isLoading && (
-          <Spinner width={20} height={20} />
+          <Spinner className={classes.spinner} width={20} height={20} />
         )}
 
-        {!isLoading && video && (
+        {!isLoading && (
           <>
-            <SwarmImg
-              image={image}
-              fallback="data:image/gif;base64,R0lGODlhAQABAPAAAAAAAAAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw=="
-            />
-            <a className={classes.play} href={externalLink} target="_blank">
-              <Play width={80} height={80} />
-            </a>
+            {isPlaying ? (
+              <video className={classes.video} src={videoSrc} autoPlay controls />
+            ) : (
+              <>
+                <SwarmImg
+                  image={image}
+                  fallback="data:image/gif;base64,R0lGODlhAQABAPAAAAAAAAAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw=="
+                />
+                <button className={classes.play} onClick={() => setIsPlaying(true)}>
+                  <Play width={80} height={80} />
+                </button>
+              </>
+            )}
           </>
-        )}
-
-        {!isLoading && !video && (
-          <InfoIcon className={classes.errorIcon} />
         )}
       </div>
 

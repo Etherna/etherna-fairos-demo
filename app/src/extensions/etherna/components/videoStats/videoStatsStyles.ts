@@ -8,6 +8,15 @@ const useStyles = makeStyles(() =>
       margin: '12px 0',
       fontSize: '1.5rem'
     },
+    commentsToggle: {
+      appearance: 'none',
+      backgroundColor: 'transparent',
+      border: 'none',
+      boxShadow: 'none',
+      "&:hover": {
+        textDecoration: 'underline'
+      }
+    },
     videoVotes: {
       display: 'flex',
       alignItems: 'center',

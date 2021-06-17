@@ -6,6 +6,7 @@ const useStyles = makeStyles(() =>
       position: 'relative',
       width: '100%',
       height: '100%',
+      backgroundColor: '#4a4a4a',
     },
     swarmImagePreview: {
       position: 'absolute',

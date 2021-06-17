@@ -1,12 +1,9 @@
-import DriverBase from "../driver/driver-base"
 import { SwarmImageRaw } from "./types"
 
 /**
  * Load an image object and handles responsive images
  */
 export default class SwarmImageReader {
-  private driver: DriverBase
-
   isResponsive: boolean
   responsiveSizes: number[]
 
@@ -18,8 +15,7 @@ export default class SwarmImageReader {
   responsiveSources?: { [size: string]: string }
   filePreview?: string
 
-  constructor(image: SwarmImageRaw | undefined, driver: DriverBase) {
-    this.driver = driver
+  constructor(image: SwarmImageRaw | undefined) {
     this.originalSource = ""
 
     if (image) {
@@ -27,7 +23,7 @@ export default class SwarmImageReader {
       this.isResponsive = image["@type"] === "responsiveImage"
       this.blurredBase64 = image.blurredBase64
       this.originalReference = image.value
-      this.originalSource = this.driver.getFileUrl(image.value)
+      this.originalSource = this.getFileUrl(image.value)
       this.originalImageSize = image.originalSize
 
       const responsiveUrls =
@@ -35,7 +31,7 @@ export default class SwarmImageReader {
           ? Object.keys(image.sources).reduce(
             (obj, size) => ({
               ...obj,
-              [size]: this.driver.getFileUrl(image.sources![size]),
+              [size]: this.getFileUrl(image.sources![size]),
             }),
             {}
           )
@@ -58,5 +54,28 @@ export default class SwarmImageReader {
     return resposiveSizes.reduce(
       (srcset, size) => `${srcset ? srcset + "," : ""} ${size} ${responsiveSources[size]}`, ""
     )
+  }
+
+  // Methods
+
+  getOptimizedSrc(size?: number): string {
+    if (!this.responsiveSources || !size) return this.originalSource
+
+    const screenSize = size * (window.devicePixelRatio ?? 1)
+    const sizes = Object.keys(this.responsiveSources).map(size => +size.replace(/w$/, "")).sort()
+    const largest = sizes[sizes.length - 1]
+
+    if (size > largest) return this.responsiveSources[largest + "w"]
+
+    const optimized = sizes.find(size => size > screenSize)
+    const optimizedSrc = optimized ? this.responsiveSources[optimized + "w"] : this.responsiveSources[largest + "w"]
+
+    return optimizedSrc
+  }
+
+
+  // Utils
+  getFileUrl(reference: string) {
+    return `${process.env.REACT_APP_BEE_HOST}/files/${reference}`
   }
 }
